@@ -3,6 +3,17 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '../supabaseClient'
 
 const StaffPortal = () => {
+
+    // Add this helper function at the top of both components (after imports)
+    const getLocalDateString = () => {
+        const date = new Date();
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    };
+
+
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
     const [staffData, setStaffData] = useState(null);
@@ -15,7 +26,7 @@ const StaffPortal = () => {
 
     // Attendance states
 
-    const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+    const [selectedDate, setSelectedDate] = useState(getLocalDateString());
     const [currentMonth, setCurrentMonth] = useState(new Date());
     const [monthAttendance, setMonthAttendance] = useState([]);
     const [attendanceStatus, setAttendanceStatus] = useState('present');
@@ -113,7 +124,7 @@ const StaffPortal = () => {
     };
 
     const fetchTodayAttendance = async () => {
-        const today = new Date().toISOString().split('T')[0];
+        const today = getLocalDateString();
         const { data } = await supabase
             .from('attendance')
             .select('*')
@@ -139,7 +150,7 @@ const StaffPortal = () => {
         if (!staffData) return;
 
         // Only allow marking today's attendance
-        const today = new Date().toISOString().split('T')[0];
+        const today = getLocalDateString();
         if (selectedDate !== today) {
             alert('You can only mark attendance for today!');
             return;
@@ -444,9 +455,9 @@ const StaffPortal = () => {
 
                                             // Days of month
                                             for (let day = 1; day <= daysInMonth; day++) {
-                                                const dateStr = new Date(year, month, day).toISOString().split('T')[0];
+                                                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
                                                 const attendance = monthAttendance.find(a => a.date === dateStr);
-                                                const isToday = dateStr === new Date().toISOString().split('T')[0];
+                                                const isToday = dateStr === getLocalDateString();
 
                                                 days.push(
                                                     <div
